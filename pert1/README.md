@@ -46,6 +46,6 @@ Widget `Icon` digunakan untuk menampilkan berbagai macam icon yang sudah disedia
 
 Pada modul ini saya membuat aplikasi Flutter sederhana yang menampilkan identitas dan mencoba beberapa widget dasar Flutter.
 
-**Nama:** Febrian
+**Nama:** Muhammad Naufal Febrian
 **NIM:** 20240801068
 **Program Studi:** Teknik Informatika
