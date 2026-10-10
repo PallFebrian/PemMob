@@ -1,121 +1,364 @@
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+// MODEL POST
+class Post {
+  final int id;
+  final int userId;
+  final String title;
+  final String body;
+
+  const Post({
+    required this.id,
+    required this.userId,
+    required this.title,
+    required this.body,
+  });
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      id: json['id'] as int,
+      userId: json['userId'] as int,
+      title: json['title'] as String,
+      body: json['body'] as String,
+    );
+  }
+}
+
+// MODEL KOMENTAR
+class Komentar {
+  final int id;
+  final String name;
+  final String email;
+  final String body;
+
+  const Komentar({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.body,
+  });
+
+  factory Komentar.fromJson(Map<String, dynamic> json) {
+    return Komentar(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      body: json['body'] as String,
+    );
+  }
+}
+
+// API POSTINGAN
+Future<List<Post>> ambilPostingan() async {
+  final uri = Uri.parse(
+    'https://jsonplaceholder.typicode.com/posts',
+  );
+
+  final response = await http
+      .get(uri)
+      .timeout(const Duration(seconds: 10));
+
+  if (response.statusCode != 200) {
+    throw Exception(
+      'Gagal memuat postingan (kode ${response.statusCode})',
+    );
+  }
+
+  final List<dynamic> data = jsonDecode(response.body);
+
+  return data
+      .map((e) => Post.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
+
+// API KOMENTAR
+Future<List<Komentar>> ambilKomentar(int idPost) async {
+  final uri = Uri.parse(
+    'https://jsonplaceholder.typicode.com/posts/$idPost/comments',
+  );
+
+  final response = await http
+      .get(uri)
+      .timeout(const Duration(seconds: 10));
+
+  if (response.statusCode != 200) {
+    throw Exception(
+      'Gagal memuat komentar (kode ${response.statusCode})',
+    );
+  }
+
+  final List<dynamic> data = jsonDecode(response.body);
+
+  return data
+      .map((e) => Komentar.fromJson(e as Map<String, dynamic>))
+      .toList();
+}
 
 void main() {
   runApp(const MyApp());
 }
 
+// APLIKASI UTAMA
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Daftar Postingan',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorSchemeSeed: Colors.blue,
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const PostinganPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// HALAMAN DAFTAR POSTINGAN
+class PostinganPage extends StatefulWidget {
+  const PostinganPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<PostinganPage> createState() => _PostinganPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _PostinganPageState extends State<PostinganPage> {
+  late Future<List<Post>> _future;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _future = ambilPostingan();
+  }
+
+  Future<void> _muatUlang() async {
+    final futureBaru = ambilPostingan();
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _future = futureBaru;
     });
+
+    // Error ditangani oleh FutureBuilder.
+    try {
+      await futureBaru;
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        title: FutureBuilder<List<Post>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                'Daftar Postingan (${snapshot.data!.length})',
+              );
+            }
+
+            return const Text('Daftar Postingan');
+          },
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Muat ulang',
+            icon: const Icon(Icons.refresh),
+            onPressed: _muatUlang,
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      body: FutureBuilder<List<Post>>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Gagal memuat postingan:\n${snapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: _muatUlang,
+                      child: const Text('Coba lagi'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final posts = snapshot.data!;
+
+          if (posts.isEmpty) {
+            return const Center(
+              child: Text('Tidak ada postingan'),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+
+              return ListTile(
+                title: Text(post.title),
+                subtitle: Text(
+                  post.body,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetailPostinganPage(
+                        post: post,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+// HALAMAN DETAIL POSTINGAN
+class DetailPostinganPage extends StatefulWidget {
+  final Post post;
+
+  const DetailPostinganPage({
+    super.key,
+    required this.post,
+  });
+
+  @override
+  State<DetailPostinganPage> createState() =>
+      _DetailPostinganPageState();
+}
+
+class _DetailPostinganPageState
+    extends State<DetailPostinganPage> {
+  late Future<List<Komentar>> _futureKomentar;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureKomentar = ambilKomentar(widget.post.id);
+  }
+
+  Future<void> _muatUlangKomentar() async {
+    final futureBaru = ambilKomentar(widget.post.id);
+
+    setState(() {
+      _futureKomentar = futureBaru;
+    });
+
+    try {
+      await futureBaru;
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Postingan'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(
+            widget.post.title,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 12),
+          Text(widget.post.body),
+          const Divider(height: 32),
+          Text(
+            'Komentar',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+
+          FutureBuilder<List<Komentar>>(
+            future: _futureKomentar,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState ==
+                  ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Gagal memuat komentar:\n${snapshot.error}',
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: _muatUlangKomentar,
+                      child: const Text('Coba lagi'),
+                    ),
+                  ],
+                );
+              }
+
+              final komentar = snapshot.data!;
+
+              if (komentar.isEmpty) {
+                return const Text('Belum ada komentar.');
+              }
+
+              return Column(
+                children: komentar.map((k) {
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(k.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(k.email),
+                        const SizedBox(height: 4),
+                        Text(k.body),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
