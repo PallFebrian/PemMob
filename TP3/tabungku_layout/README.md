@@ -1,39 +1,57 @@
 # TabungKu - Tugas Praktikum 3
 
-## Identitas Mahasiswa
+**Nama:** Muhammad Naufal Febrian  
+**NIM:** 20240801068  
+**Mata Kuliah:** Pemrograman Mobile
 
-Nama: Muhammad Naufal Febrian  
-NIM: 20240801068  
-Mata Kuliah: Pemrograman Mobile
+## Deskripsi Aplikasi
 
-## Deskripsi
+TabungKu adalah aplikasi sederhana berbasis Flutter yang dibuat untuk menampilkan ringkasan tabungan. Aplikasi ini dikembangkan sebagai Tugas Praktikum 3 Pemrograman Mobile dengan menerapkan widget dasar Flutter yang dipelajari pada pertemuan sebelumnya.
 
-TabungKu merupakan aplikasi sederhana berbasis Flutter yang menampilkan ringkasan tabungan. Aplikasi ini dibuat untuk memenuhi Tugas Praktikum 3 mengenai penggunaan widget dasar Flutter.
+## Fitur Aplikasi
 
-## Fitur
-
-- Menampilkan saldo dan target tabungan.
-- Menampilkan persentase pencapaian target.
-- Menampilkan kategori Menabung, Tarik, dan Riwayat.
-- Menampilkan daftar transaksi menggunakan data statis.
-- Tampilan dapat menyesuaikan ukuran layar.
+- Menampilkan nama dan saldo tabungan.
+- Menampilkan target tabungan beserta persentase pencapaiannya.
+- Menampilkan tiga kategori aktivitas, yaitu Menabung, Tarik, dan Riwayat.
+- Menampilkan daftar transaksi dengan judul, tanggal, dan nominal.
+- Mendukung tampilan portrait dan landscape.
 
 ## Widget yang Digunakan
 
-MaterialApp, Scaffold, AppBar, Container, Padding, Column, Row, Expanded, SizedBox, Card, ListTile, Text, Icon, dan ListView.
+Aplikasi menggunakan beberapa widget dasar Flutter, seperti `MaterialApp`, `Scaffold`, `AppBar`, `Container`, `Padding`, `Row`, `Column`, `Expanded`, `SizedBox`, `Card`, `ListTile`, `ListView`, dan `LayoutBuilder`.
 
-## Cara Menjalankan
+## Dokumentasi Tampilan
+
+### Tampilan Portrait
+
+![Tampilan TabungKu Portrait](docs/tampilan_portrait.jpg)
+
+### Tampilan Landscape
+
+![Tampilan TabungKu Landscape](docs/tampilan_landscape.jpg)
+
+## Cara Menjalankan Aplikasi
 
 1. Pastikan Flutter SDK sudah terpasang.
-2. Buka folder `tabungku_layout` menggunakan VS Code.
-3. Jalankan `flutter pub get` melalui terminal.
-4. Hubungkan perangkat Android atau pilih emulator.
-5. Jalankan `flutter run` untuk membuka aplikasi.
+2. Clone repository:
 
-## Dokumentasi
+   ```bash
+   git clone https://github.com/PallFebrian/PemMob.git
+   ```
 
-Screenshot tampilan aplikasi disimpan pada folder `docs/`.
+3. Masuk ke folder proyek:
+
+   ```bash
+   cd PemMob/TP3/tabungku_layout
+   ```
+
+4. Jalankan perintah:
+
+   ```bash
+   flutter pub get
+   flutter run
+   ```
 
 ## Catatan
 
-Aplikasi masih menggunakan data statis. Menu Menabung, Tarik, dan Riwayat merupakan kategori tampilan dan belum memiliki fungsi navigasi.
+Aplikasi menggunakan data transaksi statis dan belum terhubung dengan database. Menu Menabung, Tarik, dan Riwayat masih berupa tampilan kategori sesuai kebutuhan tugas praktikum.
